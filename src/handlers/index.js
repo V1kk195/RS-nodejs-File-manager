@@ -6,3 +6,4 @@ export * from './cp.js';
 export * from './rm.js';
 export * from './mv.js';
 export * from "./os.js";
+export * from "./hash.js";

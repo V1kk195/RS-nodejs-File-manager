@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import { dirname, parse, isAbsolute, join } from "node:path";
 import { fileURLToPath} from "url";
 import {checkIsDir, getCommandFromMessage, getSecondArgFromMessage, getThirdArgFromMessage, showError} from "./helpers.js";
-import {ls, cat, add, rn, cp, rm, mv, os} from "./handlers/index.js";
+import {ls, cat, add, rn, cp, rm, mv, os, hash} from "./handlers/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const username =  argv[2]?.split("=")[1] || "noname";
@@ -110,6 +110,12 @@ stdin.on("data", async (data) => {
 
     if (getCommandFromMessage(message) === "os") {
         os(message);
+        printCurrentLocation();
+        return;
+    }
+
+    if (getCommandFromMessage(message) === "hash") {
+        await hash(currentLocation, getSecondArgFromMessage(message));
         printCurrentLocation();
         return;
     }
