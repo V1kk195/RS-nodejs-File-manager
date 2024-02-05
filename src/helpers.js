@@ -1,8 +1,14 @@
-import {dirname} from "node:path";
-import {fileURLToPath} from "url";
+import { stat } from "node:fs/promises";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+export const showError = () => {
+    console.log("Operation failed");
+}
 
-export const printCurrentLocation = () => {
-    console.log(`You are currently in ${__dirname}`);
+export const checkIsDir = async (path) => {
+    try {
+        const res = await stat(path);
+        return res.isDirectory();
+    } catch (e) {
+        return false;
+    }
 }
