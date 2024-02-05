@@ -9,7 +9,7 @@ export const getCommandFromMessage = (message) => {
     return message.split(/\s+/g)[0];
 }
 
-export const getPathFromMessage = (message) => {
+export const getSecondArgFromMessage = (message) => {
     return message.split(/\s+/g)[1];
 }
 
