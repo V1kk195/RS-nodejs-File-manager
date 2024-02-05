@@ -2,8 +2,8 @@ import process, { argv, stdin } from "node:process";
 import { homedir } from "node:os";
 import { dirname, parse, isAbsolute, join } from "node:path";
 import { fileURLToPath} from "url";
-import { checkIsDir, showError } from "./helpers.js";
-import { ls } from "./handlers/index.js";
+import {checkIsDir, getCommandFromMessage, getPathFromMessage, getThirdArgFromMessage, showError} from "./helpers.js";
+import { ls, cat, add, rn, cp } from "./handlers/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const username =  argv[2]?.split("=")[1] || "noname";
@@ -25,16 +25,22 @@ const up = () => {
 }
 
 const cd = async (newPath) => {
-    const res = await checkIsDir(newPath)
-    if (!res) {
-        showError();
-        return;
+    const checkPathExists = async (path) => {
+        const res = await checkIsDir(path)
+        if (!res) {
+            showError();
+        }
+
+        return res;
     }
 
     if (isAbsolute(newPath)) {
-        currentLocation = newPath;
+        const exists = await checkPathExists(newPath);
+        exists && (currentLocation = newPath);
     } else {
-        currentLocation = join(currentLocation, newPath);
+        const path = join(currentLocation, newPath);
+        const exists = await checkPathExists(path);
+        exists && (currentLocation = path);
     }
 }
 
@@ -47,8 +53,8 @@ stdin.on("data", async (data) => {
         return;
     }
 
-    if (message.split(" ")[0] === "cd") {
-        const path = message.split(/\s+/g)[1];
+    if (getCommandFromMessage(message) === "cd") {
+        const path = getPathFromMessage(message);
         await cd(path);
         printCurrentLocation();
         return;
@@ -56,6 +62,34 @@ stdin.on("data", async (data) => {
 
     if (message === "ls") {
         await ls(currentLocation);
+        printCurrentLocation();
+        return;
+    }
+
+    if (getCommandFromMessage(message) === "cat") {
+        const path = getPathFromMessage(message);
+        await cat(currentLocation, path);
+        printCurrentLocation();
+        return;
+    }
+
+    if (getCommandFromMessage(message) === "add") {
+        const name = getPathFromMessage(message);
+        await add(currentLocation, name);
+        printCurrentLocation();
+        return;
+    }
+
+    if (getCommandFromMessage(message) === "rn") {
+        const name = getPathFromMessage(message);
+        await rn(currentLocation, name, getThirdArgFromMessage(message));
+        printCurrentLocation();
+        return;
+    }
+
+    if (getCommandFromMessage(message) === "cp") {
+        const name = getPathFromMessage(message);
+        await cp(currentLocation, name, getThirdArgFromMessage(message));
         printCurrentLocation();
         return;
     }
